@@ -16,8 +16,7 @@ public class Fashion extends Product {
         this.size = size;
         this.type = type;
 
-        fashion_list.put(getProduct_id(), this);
-    }
+        fashion_list.put(getProduct_id(), this);}
 
     public String getColor() {
         return color;
