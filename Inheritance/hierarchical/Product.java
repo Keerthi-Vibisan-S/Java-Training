@@ -44,4 +44,7 @@ public abstract class Product {
         getBasicInfo();
         return "Name: "+product_name;
     }
+
+    // Real Abstract methods
+    //abstract void addProduct();
 }
