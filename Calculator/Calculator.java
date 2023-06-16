@@ -49,7 +49,7 @@ public class Calculator implements ActionListener {
         addActionEvent();
     }
 
-    public void prepareGUI() {
+    private void prepareGUI() {
         //Setting properties of JFrame(Window)
         frame = new JFrame();
         frame.setTitle("Calculator");
@@ -245,9 +245,7 @@ public class Calculator implements ActionListener {
             try {
                 Evaluate();
             } catch (Exception ex) {
-                exp.setLength(0);
-                operator="";
-                lastString.setLength(0);
+                exp.setLength(0); operator=""; lastString.setLength(0);
                 textField.setText(exp.toString());
             }
         }
@@ -267,17 +265,15 @@ public class Calculator implements ActionListener {
 
             // To prevent operators come together and un-necessary 000000
             else if ((symbols.contains(exp.toString().charAt(exp.length()-1)) && symbols.contains(txt.toString().charAt(0))) || (exp.length() == 1 && (exp.toString().charAt(exp.length()-1))=='0' && txt.equals("0")))
-            {
                 return;
-            }
         }
 
         // Symbol Backup
         if(symbols.contains(txt.charAt(0))) {
-            System.out.println("Third Condition before: "+lastString);
+            // System.out.println("Third Condition before: "+lastString);
             operator = txt;
             lastString.setLength(0);
-            System.out.println("Third Condition after: "+lastString);
+            // System.out.println("Third Condition after: "+lastString);
         }
         else {
             lastString.append(txt);
