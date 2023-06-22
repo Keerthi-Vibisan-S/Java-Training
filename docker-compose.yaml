@@ -1,0 +1,13 @@
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres.dockerfile
+    image: "postgres"
+    container_name: postgres_cont
+    environment:
+      POSTGRES_USER: vibi
+      POSTGRES_PASSWORD: vibi
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
