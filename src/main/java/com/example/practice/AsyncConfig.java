@@ -1,4 +1,4 @@
-package com.example.practice.Product.csv;
+package com.example.practice;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +13,11 @@ public class AsyncConfig {
     @Bean(name = "taskExecutor")
     public Executor taskExecutor()
     {
+        // Try to set them dynamically
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(4);
         executor.setMaxPoolSize(4);
-        executor.setQueueCapacity(200);
+        executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("ProductThread-");
         executor.initialize();
         return executor;

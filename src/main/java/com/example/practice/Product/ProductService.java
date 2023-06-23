@@ -3,10 +3,20 @@ package com.example.practice.Product;
 import com.example.practice.Exception.ProductAlreadyPresentException;
 import com.example.practice.Exception.ProductNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ProductService {
@@ -28,7 +38,7 @@ public class ProductService {
         }
     }
 
-    public List <Product> addProduct(List<Product> product) {
+    List <Product> addProduct(List<Product> product) {
         List <Product> present = new ArrayList<>();
 
         for(Product p: product) {
@@ -44,8 +54,6 @@ public class ProductService {
         }
         return present;
     }
-
-
 
     Product getById(int id) throws ProductNotFoundException {
         try{
@@ -77,4 +85,58 @@ public class ProductService {
             getById(id); // Not present exception is thrown
             dao.deleteById(id);
     }
+
+
+    // ------- Handling CSV File code -----
+    // Multi-threading @Async
+    @Async // This is to seperate the process from the main thread
+    void saveProduct(MultipartFile file) throws Exception {
+        long start = System.currentTimeMillis();
+        parseCSVFile(file);
+        long end = System.currentTimeMillis();
+        System.out.println("Total time: "+ (end-start));
+    }
+
+    void parseCSVFile(final MultipartFile file) throws Exception {
+        final List<Product> products = new ArrayList<>();
+        try {
+            // Executer Service Seperate for Multi-thread handling
+            System.out.println(Runtime.getRuntime().availableProcessors());
+            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    final String[] data = line.split(",");
+
+                    executorService.execute(() -> {
+                        Product product = new Product();
+                        if (data[0].trim().length() > 0) {
+                            product.setName(data[0]);
+                        }
+                        product.setDescription(data[1]);
+                        if (data[2].trim().length() > 0) {
+                            product.setType(data[2]);
+                        }
+                        if (data[3].trim().length() > 0) {
+                            product.setPrice(data[3]);
+                        }
+                        //System.out.println("Thread in work: "+Thread.currentThread());
+                            try {
+                                dao.save(product);
+                            } catch (Exception e) {
+                                //e.printStackTrace();
+                            }
+                    });
+                }
+            }
+            executorService.shutdown();
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (final IOException e) {
+            System.out.println("Failed to parse CSV file: " + e);
+            throw new Exception("Failed to parse CSV file: " + e);
+        }
+    }
+
 }
+
