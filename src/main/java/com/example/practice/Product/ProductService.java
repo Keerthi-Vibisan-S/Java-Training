@@ -28,7 +28,7 @@ public class ProductService {
         }
     }
 
-    List <Product> addProduct(List<Product> product) {
+    public List <Product> addProduct(List<Product> product) {
         List <Product> present = new ArrayList<>();
 
         for(Product p: product) {

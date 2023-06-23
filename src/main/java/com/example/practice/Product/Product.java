@@ -28,7 +28,7 @@ public class Product {
     private String price;
     private String description;
 
-    Product(){}
+    public Product(){}
 
     Product(int id, String name, String type, String price, String description) {
         this.id = id;
@@ -42,7 +42,7 @@ public class Product {
         return id;
     }
 
-    void setId(int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -50,14 +50,14 @@ public class Product {
         return name;
     }
 
-    void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
     public String getType() {
         return type;
     }
-    void setType(String type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -65,7 +65,7 @@ public class Product {
         return price;
     }
 
-    void setPrice(String price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 
@@ -73,7 +73,7 @@ public class Product {
         return description;
     }
 
-    void setDescription(String desc) {
+    public void setDescription(String desc) {
         this.description = desc;
     }
 
