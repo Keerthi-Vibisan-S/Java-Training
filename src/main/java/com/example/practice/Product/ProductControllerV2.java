@@ -1,5 +1,6 @@
 package com.example.practice.Product;
 
+import com.example.practice.Exception.CustomException;
 import com.example.practice.ResponseHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,7 +34,13 @@ class ProductControllerV2 {
     @ApiResponse(responseCode = "409", description = "Already product present")
     @PostMapping()
     ResponseEntity<?> addProduct(@RequestBody List<@Valid Product> product) {
-        List<Product> present = service.addProduct(product);
-        return ResponseHandler.generateResponse("Request OK, Product added Successfully,Check error for products failed to get added because they might already be present", HttpStatus.valueOf(201), null, present);
+        List<Product> present = null;
+        try {
+            present = service.addProduct(product);
+            return ResponseHandler.generateResponse("Request OK, Product added Successfully,Check error for products failed to get added because they might already be present", HttpStatus.valueOf(201), null, present);
+
+        } catch (CustomException e) {
+            return ResponseHandler.generateResponse("an error has occurred", HttpStatus.valueOf(e.getStatus_code()), "-999", e.getMessage());
+        }
     }
 }

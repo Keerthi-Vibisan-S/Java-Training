@@ -1,5 +1,6 @@
 package com.example.practice.Product;
 
+import com.example.practice.Exception.CustomException;
 import com.example.practice.ResponseHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,13 +16,16 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 @RestController
 @RequestMapping("/api/v3/products")
@@ -38,16 +42,30 @@ class ProductControllerV3 {
     @ApiResponse(responseCode = "500", description = "Error in server while processing file")
     @PostMapping(value = "")
     ResponseEntity<?> saveData(@RequestParam(value = "files") MultipartFile [] files) {
-        List<Product> p = new ArrayList<>();
+        //Future<List<Product>> p = new Future<List<Product>>();
+
         for(MultipartFile f: files) {
             try {
                 service.saveProduct(f);
+            } catch (CustomException e) {
+                return ResponseHandler.generateResponse("OOP's Error while adding data from file", HttpStatus.valueOf(e.getStatus_code()), "-999", e.getMessage());
             } catch (Exception e) {
-                return ResponseHandler.generateResponse("OOP's Error while adding data from file", HttpStatus.INTERNAL_SERVER_ERROR, "-999", "The file might contain wrong format of data");
+                throw new RuntimeException(e);
             }
         }
         return ResponseHandler.generateResponse("Data from file added Successfully", HttpStatus.valueOf(201), "Data added", null);
     }
+
+    @GetMapping("")
+    ResponseEntity<?> getCSV() throws CustomException {
+        byte [] csv = service.generateCSV().getBytes();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
+        headers.setContentDispositionFormData("attachment", "data.csv");
+        return ResponseEntity.ok().headers(headers).body(csv);
+    }
+
 
 //    @Autowired
 //    private JobLauncher jobLauncher;
