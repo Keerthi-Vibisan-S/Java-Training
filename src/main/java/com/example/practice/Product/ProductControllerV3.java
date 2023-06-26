@@ -1,5 +1,6 @@
 package com.example.practice.Product;
 
+import com.example.practice.ConstantStrings;
 import com.example.practice.Exception.CustomException;
 import com.example.practice.ResponseHandler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,14 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,10 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
 
 @RestController
 @RequestMapping("/api/v3/products")
@@ -42,8 +32,6 @@ class ProductControllerV3 {
     @ApiResponse(responseCode = "500", description = "Error in server while processing file")
     @PostMapping(value = "")
     ResponseEntity<?> saveData(@RequestParam(value = "files") MultipartFile [] files) {
-        //Future<List<Product>> p = new Future<List<Product>>();
-
         for(MultipartFile f: files) {
             try {
                 service.saveProduct(f);
@@ -56,33 +44,22 @@ class ProductControllerV3 {
         return ResponseHandler.generateResponse("Data from file added Successfully", HttpStatus.valueOf(201), "Data added", null);
     }
 
+    @Operation(summary = "Export data via CSV File")
+    @ApiResponse(responseCode = "200", description = "Data Exported",
+            content = {@Content(mediaType = "MultiPartFile", schema = @Schema(implementation = Product.class))})
+    @ApiResponse(responseCode = "500", description = "Error in server while processing file")
     @GetMapping("")
-    ResponseEntity<?> getCSV() throws CustomException {
-        byte [] csv = service.generateCSV().getBytes();
+    ResponseEntity<?> getCSV() {
+        try {
+            byte [] csv = service.generateCSV().getBytes();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.TEXT_PLAIN);
+            headers.setContentDispositionFormData("attachment", "data.csv");
+            return ResponseEntity.ok().headers(headers).body(csv);
+        } catch (CustomException e) {
+            return ResponseHandler.generateResponse(ConstantStrings.SERVER_ERROR, HttpStatus.valueOf(e.getStatus_code()), "-999", e.getMessage());
+        }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_PLAIN);
-        headers.setContentDispositionFormData("attachment", "data.csv");
-        return ResponseEntity.ok().headers(headers).body(csv);
+
     }
-
-
-//    @Autowired
-//    private JobLauncher jobLauncher;
-//    @Autowired
-//    private Job job;
-
-
-//    @PostMapping("/importProducts")
-//    public void importCsvToDBJob() {
-//        JobParameters jobParameters = new JobParametersBuilder()
-//                .addLong("startAt", System.currentTimeMillis()).toJobParameters();
-//        try {
-//            jobLauncher.run(job, jobParameters);
-//        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException |
-//                 JobParametersInvalidException e) {
-//            System.out.println("========================= Here =======================");
-//            e.printStackTrace();
-//        }
-//    }
 }

@@ -2,23 +2,18 @@ package com.example.practice.Product;
 
 import com.example.practice.ConstantStrings;
 import com.example.practice.Exception.CustomException;
-import com.sun.jdi.connect.spi.ClosedConnectionException;
-import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ConstraintViolationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
-import java.sql.SQLTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -40,7 +35,7 @@ public class ProductService {
         catch (Exception e) // Might be DB Connection failed (here we get 5 to 6 exception)
         {
             //e.printStackTrace();
-            throw new CustomException("Internal Server Error", 500);
+            throw new CustomException(ConstantStrings.SERVER_ERROR, 500);
         }
     }
 
@@ -50,44 +45,42 @@ public class ProductService {
             dao.save(product);
         } catch (DataIntegrityViolationException e) {
             //e.printStackTrace();
-            throw new CustomException(ConstantStrings.product_already_found, 409);
+            throw new CustomException(ConstantStrings.PRODUCT_ALREADY_FOUND, 409);
         } catch (Exception e) // Might be DB Connection failed
         {
             //e.printStackTrace();
-            throw new CustomException("Internal Server Error", 500);
+            throw new CustomException(ConstantStrings.SERVER_ERROR, 500);
         }
     }
 
-    // Optimise it ---------
+    // Adding an Array
     List <Product> addProduct(List<Product> product) throws CustomException {
-        List <Product> present = new ArrayList<>();
-
+        List <Product> addPro = new ArrayList<>();
+        List <Product> duplicate = new ArrayList<>();
         for(Product p: product) {
+            if(dao.findByName(p.getName()) == null) addPro.add(p);
+            else duplicate.add(p);
+        }
             try{
-                dao.save(p);
-            } catch (DataIntegrityViolationException | ConstraintViolationException e) {
-                present.add(p);
-                continue;
-                //throw new ProductAlreadyPresentException("Product Already Present");
-            }
-            catch (Exception e) // Might be DB Connection failed
+                dao.saveAll(addPro);
+            } catch (Exception e) // Might be DB Connection failed
             {
                 //e.printStackTrace();
-                throw new CustomException("Internal Server Error", 500);
+                throw new CustomException(ConstantStrings.SERVER_ERROR, 500);
             }
-        }
-        return present;
+
+        return duplicate;
     }
 
     Product getById(int id) throws CustomException {
         try{
             return dao.findById(id).get();
         } catch (NoSuchElementException e) {
-            throw new CustomException(ConstantStrings.product_not_found, 200);
+            throw new CustomException(ConstantStrings.PRODUCT_NOT_FOUND, 200);
         } catch (Exception e) // Might be DB Connection failed
         {
             //e.printStackTrace();
-            throw new CustomException("Internal Server Error", 500);
+            throw new CustomException(ConstantStrings.SERVER_ERROR, 500);
         }
     }
 
@@ -102,11 +95,11 @@ public class ProductService {
             try{
                 dao.save(existing);
             } catch (DataIntegrityViolationException e) {
-                throw new CustomException(ConstantStrings.product_already_found, 409);
+                throw new CustomException(ConstantStrings.PRODUCT_ALREADY_FOUND, 409);
             } catch (Exception e) // Might be DB Connection failed
             {
                 //e.printStackTrace();
-                throw new CustomException("Internal Server Error", 500);
+                throw new CustomException(ConstantStrings.SERVER_ERROR, 500);
             }
     }
 
@@ -114,6 +107,35 @@ public class ProductService {
         // Checking if present or not
             getById(id); // Not present exception is thrown
             dao.deleteById(id);
+    }
+
+    // PUT Update - Dynamic Fields Update
+    void updateAField(int id, Product product) throws CustomException {
+        //product.setId(id);
+        //dao.save(product);
+        Product existing = getById(id);
+
+        if(product.getName()!=null && !product.getName().isBlank()) {
+            existing.setName(product.getName());
+        }
+        if(product.getPrice()!=null && !product.getPrice().isBlank()) {
+            existing.setPrice(product.getPrice());
+        }
+        if(product.getType()!=null && !product.getType().isBlank()) {
+            existing.setType(product.getType());
+        }
+        if(product.getDescription()!=null && !product.getDescription().isBlank()) {
+            existing.setDescription(product.getDescription());
+        }
+        try{
+            dao.save(existing);
+        } catch (DataIntegrityViolationException e) {
+            throw new CustomException(ConstantStrings.PRODUCT_ALREADY_FOUND, 409);
+        } catch (Exception e) // Might be DB Connection failed
+        {
+            //e.printStackTrace();
+            throw new CustomException(ConstantStrings.SERVER_ERROR, 500);
+        }
     }
 
 
@@ -160,7 +182,7 @@ public class ProductService {
             throw new CustomException("Failed to read CSV File", 400);
         } catch (Exception e) // Might be DB Connection failed
         {
-            throw new CustomException("Internal Server Error", 500);
+            throw new CustomException(ConstantStrings.SERVER_ERROR, 500);
         }
     }
 
@@ -172,6 +194,16 @@ public class ProductService {
         });
         return csv.toString();
     }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -199,6 +231,7 @@ public class ProductService {
 //        return "";
 //    }
 //
+
 //    List<Product> parse(MultipartFile file) throws Exception {
 //        final List<Product> products = new ArrayList<>();
 //        List<CompletableFuture<String>> completableFutures = new ArrayList<>();

@@ -1,12 +1,15 @@
 package com.example.practice.Product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
+@DynamicUpdate
 public class Product {
     @Id
     @SequenceGenerator(

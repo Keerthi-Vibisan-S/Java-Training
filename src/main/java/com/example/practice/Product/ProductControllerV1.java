@@ -34,7 +34,7 @@ public class ProductControllerV1 {
             return ResponseHandler.generateResponse("Products Data", HttpStatus.valueOf(200), service.getAll(), null);
         }
         catch (CustomException e) {
-            return ResponseHandler.generateResponse(ConstantStrings.custom_message_db_error, HttpStatus.valueOf(e.getStatus_code()),"-999", e.getMessage());
+            return ResponseHandler.generateResponse(ConstantStrings.CUSTOM_MESSAGE_DB_ERROR, HttpStatus.valueOf(e.getStatus_code()),"-999", e.getMessage());
         }
     }
 
@@ -48,7 +48,7 @@ public class ProductControllerV1 {
         try {
             return ResponseHandler.generateResponse("Data of product with Id: "+id, HttpStatus.OK, service.getById(Integer.parseInt(id)), null);
         } catch (NumberFormatException e) {
-            return ResponseHandler.generateResponse("Bad Request", HttpStatus.BAD_REQUEST,"-999", "The path variable must be an Integer");
+            return ResponseHandler.generateResponse("Bad Request", HttpStatus.BAD_REQUEST,"-999", ConstantStrings.PATH_VARIABLE_ERROR);
         } catch (CustomException e) {
             return ResponseHandler.generateResponse("Request OK, product not found", HttpStatus.valueOf(e.getStatus_code()), null, e.getMessage());
         }
@@ -66,7 +66,7 @@ public class ProductControllerV1 {
             return ResponseHandler.generateResponse("Request OK, Product added Successfully,Check error for products failed to get added because they might already be present", HttpStatus.valueOf(201), product, null);
 
         } catch (CustomException e) {
-            return ResponseHandler.generateResponse("You are trying to add a product which is already available", HttpStatus.valueOf(e.getStatus_code()), "-999", e.getMessage());
+            return ResponseHandler.generateResponse(ConstantStrings.ALREADY_AVAILABLE_MSG, HttpStatus.valueOf(e.getStatus_code()), "-999", e.getMessage());
         }
     }
 
@@ -80,11 +80,11 @@ public class ProductControllerV1 {
     ResponseEntity <?> updateProduct(@Valid @RequestBody Product product, @PathVariable(name = "id") String id) {
         try {
             service.updateProduct(product, Integer.parseInt(id));
-            return ResponseHandler.generateResponse("Updated Successfully", HttpStatus.valueOf(202), product, null);
+            return ResponseHandler.generateResponse(ConstantStrings.SERVER_SUCCESS, HttpStatus.valueOf(202), product, null);
         }catch (NumberFormatException e) {
-            return ResponseHandler.generateResponse("Bad Request", HttpStatus.BAD_REQUEST,"-999", "The path variable must be an Integer");
+            return ResponseHandler.generateResponse(ConstantStrings.BAD_REQUEST, HttpStatus.BAD_REQUEST,"-999", ConstantStrings.PATH_VARIABLE_ERROR);
         } catch (CustomException e){
-            return ResponseHandler.generateResponse("You are trying to add a product which is already available", HttpStatus.valueOf(e.getStatus_code()), "-999", e.getMessage());
+            return ResponseHandler.generateResponse(ConstantStrings.ALREADY_AVAILABLE_MSG, HttpStatus.valueOf(e.getStatus_code()), "-999", e.getMessage());
         }
 
     }
@@ -98,12 +98,30 @@ public class ProductControllerV1 {
     ResponseEntity<?> deleteProduct(@PathVariable(name="id") String id) {
         try {
             service.deleteProduct(Integer.parseInt(id));
-            return ResponseHandler.generateResponse("Product with id "+id+" deleted", HttpStatus.OK, "Product with id "+id+" deleted", null);
+            return ResponseHandler.generateResponse(ConstantStrings.SERVER_SUCCESS, HttpStatus.OK, "Product with id "+id+" deleted", null);
         }
         catch (NumberFormatException e) {
-            return ResponseHandler.generateResponse("Bad Request", HttpStatus.BAD_REQUEST,"-999", "The path variable must be an Integer");
+            return ResponseHandler.generateResponse(ConstantStrings.BAD_REQUEST, HttpStatus.BAD_REQUEST,"-999", ConstantStrings.PATH_VARIABLE_ERROR);
         } catch (CustomException e) {
-            return ResponseHandler.generateResponse(ConstantStrings.custom_message_not_found, HttpStatus.OK,null, e.getMessage());
+            return ResponseHandler.generateResponse(ConstantStrings.CUSTOM_MESSAGE_NOT_FOUND, HttpStatus.OK,null, e.getMessage());
+        }
+    }
+
+    // Patch
+    @Operation(summary = "Path a product or Update a specific field or value")
+    @ApiResponse(responseCode = "202", description = "updated Products",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Product.class))})
+    @ApiResponse(responseCode = "200", description = "request ok but product not found")
+    @ApiResponse(responseCode = "409", description = "product you are trying to update as is already present")
+    @PatchMapping("{id}")
+    ResponseEntity<?> updateByValue(@RequestBody Product product, @PathVariable(name = "id") String id){
+        try {
+            service.updateAField(Integer.parseInt(id), product);
+            return ResponseHandler.generateResponse(ConstantStrings.SERVER_SUCCESS, HttpStatus.valueOf(202), "Updated Successfully", null);
+        } catch (NumberFormatException e) {
+            return ResponseHandler.generateResponse(ConstantStrings.BAD_REQUEST, HttpStatus.BAD_REQUEST,"-999", ConstantStrings.PATH_VARIABLE_ERROR);
+        } catch (CustomException e) {
+            return ResponseHandler.generateResponse(ConstantStrings.AN_ERROR_OCCURRED, HttpStatus.valueOf(e.getStatus_code()), null, e.getMessage());
         }
     }
 }
