@@ -9,14 +9,16 @@ import { useState } from 'react';
 export default function App() {
     const [modal, setModal] = useState(false);
     return(
-    <section className='p-5 min-h-[100vh] max-h-[100vh]'>
+    <section className='min-h-[102vh] max-h-[100vh] md:flex'>
         <Sidebar modal={setModal} />
-        {modal?<Modal status={setModal} />:""}
-        <Routes>
-            <Route path="/" element={ <Home/> } />
-            <Route path="/update" element={ <UpdateProduct/> } />
-            <Route path="/addproduct" element={ <AddProduct /> } />
-      </Routes>
+        <section className='w-[100%]'>
+            {modal?<Modal status={setModal} />:""}
+            <Routes>
+                <Route path="/" element={ <Home/> } />
+                <Route path="/update" element={ <UpdateProduct/> } />
+                <Route path="/addproduct" element={ <AddProduct /> } />
+        </Routes>
+      </section>
     </section>
     );
 }

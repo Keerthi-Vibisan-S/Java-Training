@@ -39,7 +39,7 @@ export default function Home() {
 
     // Paging
     const [currentPage, setCurrentPage] = useState(1);
-    const recordsPerPage = 8;
+    const recordsPerPage = 12;
     const lastIndex = currentPage * recordsPerPage;
     const firstIndex = lastIndex - recordsPerPage;
     const records = data.slice(firstIndex, lastIndex);
@@ -98,19 +98,19 @@ export default function Home() {
                         {records.map((item, key) => {
                             return (
                                 <tr key={key} className="border-b border-blue-gray-50">
-                                    <td className="p-4">{item.id}</td>
-                                    <td className="p-4">{item.name}</td>
-                                    <td className="p-4">{item.type}</td>
-                                    <td className="p-4">{item.description}</td>
-                                    <td className="p-4">{item.price}</td>
-                                    <td className="p-4 flex justify-evenly"><ai.AiFillEdit onClick={() => navigatePage(item)} className="text-yellow-800 cursor-pointer" size={20}/><ai.AiFillDelete onClick={() => deleteData(item.id)} className="text-red-600 cursor-pointer" size={20}/> </td>
+                                    <td className="p-3">{item.id}</td>
+                                    <td className="p-3">{item.name}</td>
+                                    <td className="p-3">{item.type}</td>
+                                    <td className="p-3">{item.description}</td>
+                                    <td className="p-3">{item.price}</td>
+                                    <td className="p-3 flex justify-evenly"><ai.AiFillEdit onClick={() => navigatePage(item)} className="text-yellow-800 cursor-pointer" size={20}/><ai.AiFillDelete onClick={() => deleteData(item.id)} className="text-red-600 cursor-pointer" size={20}/> </td>
                                 </tr>
                             );
                         })}
 
                     </tbody>
                 </table>
-                <div className="flex justify-between mt-3">
+                <div className="flex justify-between mt-3 p-2">
                     <p>Number of Record's: <b>{data.length}</b></p>
                     <div className="flex">
                         <div className="flex">
