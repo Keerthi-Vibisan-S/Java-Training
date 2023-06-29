@@ -9,7 +9,7 @@ import { useState } from 'react';
 export default function App() {
     const [modal, setModal] = useState(false);
     return(
-    <section className='min-h-[102vh] max-h-[100vh] md:flex'>
+    <section className='min-h-[100vh] max-h-[100vh] md:flex p-2'>
         <Sidebar modal={setModal} />
         <section className='w-[100%]'>
             {modal?<Modal status={setModal} />:""}
