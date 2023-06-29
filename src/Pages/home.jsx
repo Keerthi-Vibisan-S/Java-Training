@@ -1,33 +1,41 @@
 import Axios from "axios";
 import { useEffect, useState } from "react";
-import { getAllProducts } from "../utils/apis";
+import { getAllProducts, serverv1 } from "../utils/apis";
 import * as ai from 'react-icons/ai';
 import ErrorToast from "../Components/Toast/errorToast";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
 
     const [data, setData] = useState([]);
     const [errorTost, setErrorToast] = useState(false);
     const [errorMsg, setErrorMsg] = useState("No Data Available");
+    const [toastStatus, setToastStatus] = useState(false);
+
+    const navigate = useNavigate();
+
+    function navigatePage(data) {
+        console.log(data);
+        navigate("/update", {state:data});
+    }
 
     useEffect(() => {
-        async function getAllData() {
-            try {
-                let result = await Axios.get(getAllProducts);
-                setData(result.data.data);
-            }
-            catch(error) {
-                console.log("ERRROR ",error);
-                setErrorMsg(error.message);
-                setErrorToast(true);
-            }
-    
-            setTimeout(() => {
-                setErrorToast(false);
-            }, 6000);
-        }
         getAllData();
     }, []);
+    
+    async function getAllData() {
+        try {
+            let result = await Axios.get(getAllProducts);
+            setData(result.data.data);
+        }
+        catch(error) {
+            // console.log("ERRROR ",error);
+            setErrorMsg(error.message);
+            setToastStatus(false);
+            setErrorToast(true);
+        }
+        toastOff();
+    }
 
     // Paging
     const [currentPage, setCurrentPage] = useState(1);
@@ -37,15 +45,38 @@ export default function Home() {
     const records = data.slice(firstIndex, lastIndex);
     const npage = Math.ceil(data.length/recordsPerPage);
 
-    function setPage(page, move) {
-        if(page == 0) setCurrentPage(1);
-        else if(page > npage) setCurrentPage(npage);
+    function setPage(page) {
+        if(page > npage) setCurrentPage(1);
+        else if(page <= 0) setCurrentPage(npage);
         else setCurrentPage(page);
     }
 
+    async function deleteData(id) {
+        let con = window.confirm(`Are you sure do you want to delete product with ID: ${id}`);
+        console.log(con);
+        if(con) {
+            try{
+                let res = await Axios.delete(`${serverv1}/${id}`);
+                if(res.data.data !== null) getAllData();
+                else {
+                    setErrorMsg(res.data.error);
+                    setToastStatus(false);
+                    setErrorToast(true);
+                }
+            } catch(error) {
+                console.log(error.response);
+            }
+            toastOff();
+        }
+    }
+
+    const toastOff = () => setTimeout(() => {
+        setErrorToast(false);
+    }, 5000);
+
     return (
         <section>
-            {errorTost?<ErrorToast close={setErrorToast} error={errorMsg}/>:""}
+            {errorTost?<ErrorToast status={toastStatus} close={setErrorToast} error={errorMsg}/>:""}
             <div>
 
             </div>
@@ -72,21 +103,23 @@ export default function Home() {
                                     <td className="p-4">{item.type}</td>
                                     <td className="p-4">{item.description}</td>
                                     <td className="p-4">{item.price}</td>
-                                    <td className="p-4 flex justify-evenly"><ai.AiFillDelete className="text-red-600" size={20}/> <ai.AiFillEdit className="text-yellow-800" size={20}/></td>
+                                    <td className="p-4 flex justify-evenly"><ai.AiFillEdit onClick={() => navigatePage(item)} className="text-yellow-800 cursor-pointer" size={20}/><ai.AiFillDelete onClick={() => deleteData(item.id)} className="text-red-600 cursor-pointer" size={20}/> </td>
                                 </tr>
                             );
                         })}
 
                     </tbody>
                 </table>
-                <div className="flex justify-end mt-3">
-
+                <div className="flex justify-between mt-3">
+                    <p>Number of Record's: <b>{data.length}</b></p>
                     <div className="flex">
-                        <input type="number" className="w-fit outline-none text-right font-bold" onChange={(e) => setPage(e.target.value)} value={currentPage} /><p className="p-1">/ {npage}</p>
-                    </div>
+                        <div className="flex">
+                            <input type="number" className="w-fit outline-none text-right font-bold" onChange={(e) => setPage(e.target.value)} value={currentPage} /><p className="p-1">/ {npage}</p>
+                        </div>
 
-                    <button onClick={() => setPage(currentPage-1, "prev")} className="" ><ai.AiFillBackward size={32}/></button>
-                    <button onClick={() => setPage(currentPage+1, "next")} className=""><ai.AiFillForward size={32}/></button>
+                        <button onClick={() => setPage(currentPage-1, "prev")} className="" ><ai.AiFillStepBackward size={30}/></button>
+                        <button onClick={() => setPage(currentPage+1, "next")} className=""><ai.AiFillStepForward size={30}/></button>
+                    </div>
                 </div>
                 </>
                 :

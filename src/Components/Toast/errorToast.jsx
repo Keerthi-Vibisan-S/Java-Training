@@ -1,12 +1,16 @@
+import * as bi from 'react-icons/bi';
+import * as gr from 'react-icons/gr';
+
 export default function ErrorToast(props) {
 
-    const {close, error} = props;
-
+  // status --- false error
+  // true good
+    const {close, error, status} = props;
   return (
     
-    <div id="toast-default" className="fixed bottom-10 right-10 flex items-center w-full max-w-xs p-4 text-white bg-red-500 rounded-lg shadow" role="alert">
-        <div className="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg">
-            500
+    <div id="toast-default" className={`${status?'bg-green-500':'bg-red-500'} fixed bottom-10 right-10 flex items-center w-full max-w-xs p-4 text-white  rounded-lg shadow`} role="alert">
+        <div className={`inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${status?'bg-green-100 text-green-500':'text-red-500 bg-red-100 '}  rounded-lg`}>
+            {status?<gr.GrStatusGood size={28} />:<bi.BiErrorCircle size={30}/>}
         </div>
         <div className="ml-3 text-sm font-normal">{error}</div>
         <button onClick={() => close(false)} type="button" className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-default" aria-label="Close">

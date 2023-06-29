@@ -1,14 +1,14 @@
 import ReactDom from 'react-dom';
 import "./index.css";
-import Home from './Pages/home';
-import Sidebar from './Components/Sidebar';
+import { BrowserRouter } from "react-router-dom";
+import App from './app';
+
 
 function Index() {
   return(
-    <section className='p-5 min-h-[100vh] max-h-[100vh]'>
-      <Sidebar />
-      <Home />
-    </section>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   );
 }
 
