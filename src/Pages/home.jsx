@@ -15,7 +15,7 @@ export default function Home() {
     const navigate = useNavigate();
 
     function navigatePage(data) {
-        console.log(data);
+        // console.log(data);
         navigate("/update", {state:data});
     }
 
@@ -53,7 +53,7 @@ export default function Home() {
 
     async function deleteData(id) {
         let con = window.confirm(`Are you sure do you want to delete product with ID: ${id}`);
-        console.log(con);
+        //console.log(con);
         if(con) {
             try{
                 let res = await Axios.delete(`${serverv1}/${id}`);
