@@ -11,11 +11,16 @@ export default function Sidebar(props) {
     }
 
     return(
-        <section className='p-2 w-[100%] flex justify-end mb-2 text-white'>
-            <Link to="/" onClick={() => closeModal()} className='bg-blue-600 p-2 mr-4 cursor-pointer hover:scale-105 transition-all'><ai.AiOutlineHome size={28}/></Link>
-            <Link to="/addproduct" onClick={() => closeModal()} className='bg-green-600 p-2 mr-4 cursor-pointer hover:scale-105 transition-all'><ai.AiFillPlusSquare size={28} /></Link>
-            <button onClick={() => modal(true)} className='bg-purple-600 p-2 mr-4 cursor-pointer hover:scale-105 transition-all'><ai.AiFillFileAdd size={28} /></button>
-            <a href={serverv2} download={'data.csv'} rel="noopener"  onClick={() => {closeModal()}} className='bg-orange-600 p-2 cursor-pointer hover:scale-105 transition-all'><ai.AiOutlineCloudDownload size={28} /></a>
+        <section className='p-3 px-3 w-[100%] my-bg-black flex justify-between mb-2 shadow-xl'>
+            <div className='flex items-center my-text-teal text-2xl'>
+                Logo Here
+            </div>
+            <div className='flex justify-end'>
+                <Link to="/" onClick={() => closeModal()} className='my-bg-grey rounded-lg flex items-center p-2 mr-4 cursor-pointer hover:scale-105 transition-all'><ai.AiOutlineHome className='mr-1' size={24}/> <p className='hidden lg:block'>Home</p></Link>
+                <Link to="/addproduct" onClick={() => closeModal()} className='my-bg-grey rounded-lg flex items-center p-2 mr-4 cursor-pointer hover:scale-105 transition-all'><ai.AiFillPlusSquare className='mr-1' size={24} /><p className='hidden lg:block'>Add Product</p></Link>
+                <button onClick={() => modal(true)} className='my-bg-grey rounded-lg flex items-center p-2 mr-4 cursor-pointer hover:scale-105 transition-all'><ai.AiFillFileAdd className='mr-1' size={22} /><p className='hidden lg:block'>Export</p></button>
+                <a href={serverv2} download={'data.csv'} rel="noopener"  onClick={() => {closeModal()}} className='rounded-lg my-bg-grey p-2 cursor-pointer hover:scale-105 flex items-center transition-all'><ai.AiOutlineCloudDownload className='mr-1' size={28} /><p className='hidden lg:block'>Download</p></a>
+            </div>
         </section>
     );
 }

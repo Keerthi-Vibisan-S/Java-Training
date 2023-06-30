@@ -14,7 +14,7 @@ export default function App()
 
     const [modal, setModal] = useState(false);
     return(
-    <section className='p-5 min-h-[100vh] max-h-[100vh]'>
+    <section className="min-h-[100vh] max-h-[100vh] overflow-hidden my-bg-white">
         <Sidebar modal={setModal} />
         {modal?<Modal status={setModal} />:""}
         <Routes>

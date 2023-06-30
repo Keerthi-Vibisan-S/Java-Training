@@ -51,7 +51,7 @@ export default function UpdateProduct() {
     }
 
     return (
-        <section className="flex flex-col justify-center items-center">
+        <section className="flex flex-col justify-center items-center mt-5">
             {toast?<ErrorToast status={toastStatus} close={setToast} error={errorMsg} />:""}
 
             <p className="font-semibold text-3xl text-center">Update Product</p>

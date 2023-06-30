@@ -13,3 +13,39 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+.my-text-black {
+  color: #A0C49D;
+}
+
+.my-border-black {
+  border-color: #A0C49D;
+}
+
+.my-bg-black {
+  background-color: #A0C49D;
+}
+
+.my-text-grey {
+  color: #C4D7B2;
+}
+
+.my-bg-grey {
+  background-color: #C4D7B2;
+}
+
+.my-text-teal {
+  color: #E1ECC8;
+}
+
+.my-bg-teal {
+  background-color: #E1ECC8;
+}
+
+.my-text-white {
+  color: #F7FFE5;
+}
+
+.my-bg-white {
+  background-color: #F7FFE5;
+}

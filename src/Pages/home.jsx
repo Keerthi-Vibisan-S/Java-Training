@@ -11,11 +11,12 @@ export default function Home() {
     const [errorTost, setErrorToast] = useState(false);
     const [errorMsg, setErrorMsg] = useState("No Data Available");
     const [toastStatus, setToastStatus] = useState(false);
-    const currentPage = useRef(0);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-
-
+    const [pagesize, setPagesize] = useState(10);
+    const currentPage = useRef(0);
+    
+    
     const navigate = useNavigate();
 
     function navigatePage(data) {
@@ -25,14 +26,15 @@ export default function Home() {
 
     useEffect(() => {
         getAllData();
-    }, []);
+    }, [pagesize]);
     
     async function getAllData() {
         try {
-            let result = await Axios.get(`${getAllProducts}/${currentPage.current}/10`);
-            setData(result.data.data.content);
-            setTotalElements(result.data.data.totalElements);
-            setTotalPages(result.data.data.totalPages);
+            let result = await Axios.get(`${getAllProducts}?offset=${currentPage.current}&size=${pagesize}`);
+            //console.log(result.data.data);
+            setData(result.data.data.result);
+            setTotalElements(result.data.data.metadata.total_datas);
+            setTotalPages(result.data.data.metadata.total_pages);
         }
         catch(error) {
             // console.log("ERRROR ",error);
@@ -50,8 +52,8 @@ export default function Home() {
             return;
         }
         //if(page.trim==="") return;
-        if(page > totalPages-1) currentPage.current = 0;
-        else if(page <= -1) currentPage.current = totalPages-1;
+        if(page > totalPages-1) currentPage.current = totalPages-1;
+        else if(page <= -1) currentPage.current = 0;
         else currentPage.current = page;
 
         getAllData();
@@ -59,7 +61,7 @@ export default function Home() {
 
     async function deleteData(id) {
         let con = window.confirm(`Are you sure do you want to delete product with ID: ${id}`);
-        console.log(con);
+        //console.log(con);
         if(con) {
             try{
                 let res = await Axios.delete(`${serverv1}/${id}`);
@@ -81,16 +83,14 @@ export default function Home() {
     }, 5000);
 
     return (
-        <section>
+        <section className="p-2">
             {errorTost?<ErrorToast status={toastStatus} close={setErrorToast} error={errorMsg}/>:""}
             <div>
-
-            </div>
-            <div>
             {data.length !== 0?<>
-                <table className="w-full min-w-max table-auto text-left">
-                    <thead>
-                        <tr className="bg-slate-200 border-b border-blue-gray-100 bg-blue-gray-50">
+            <div className="overflow-scroll max-h-[75vh] md:max-h-[75vh] lg:h-[80vh]">
+                <table className="w-full overflow-scroll min-w-max table-auto text-left">
+                    <thead className="sticky top-0">
+                        <tr className="my-bg-teal border-b border-blue-gray-100 bg-blue-gray-50">
                             <th className="p-4">ID</th>
                             <th className="p-4">Name</th>
                             <th className="p-4">Type</th>
@@ -103,7 +103,7 @@ export default function Home() {
 
                         {data.map((item, key) => {
                             return (
-                                <tr key={key} className="border-b border-blue-gray-50">
+                                <tr key={key} className="border-b my-border-black">
                                     <td className="p-3">{item.id}</td>
                                     <td className="p-3">{item.name}</td>
                                     <td className="p-3">{item.type}</td>
@@ -116,11 +116,21 @@ export default function Home() {
 
                     </tbody>
                 </table>
-                <div className="flex justify-between mt-3 p-2">
+                </div>
+                <div className="flex lg:flex-row flex-col justify-between mt-3 p-2 ">
                     <p>Number of Record's: <b>{totalElements}</b></p>
-                    <div className="flex">
+                    <div className="">
+                        <label>Page Size</label>
+                        <select onChange={(e) => setPagesize(e.target.value)} className="ml-2 font-bold my-bg-teal" value={pagesize}>
+                            <option value={10} defaultValue>10</option>
+                            <option value={25}>25</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
+                    </div>
+                    <div className="flex justify-end">
                         <div className="flex">
-                            <input type="number" className="w-fit outline-none text-right font-bold" onChange={(e) => setPage(e.target.value-1)} value={parseInt(currentPage.current)+1} /><p className="p-1">/ {totalPages}</p>
+                            <input type="number" className="w-fit outline-none text-right font-bold my-bg-white" onChange={(e) => setPage(e.target.value-1)} value={parseInt(currentPage.current)+1} /><p className="p-1">/ {totalPages}</p>
                         </div>
 
                         <button onClick={() => setPage(currentPage.current-1, "prev")} className="" ><ai.AiFillStepBackward size={30}/></button>

@@ -73,9 +73,9 @@ export default function Modal(props)
     }, 5000);
 
     return(
-        <div className={`bg-white shadow-2xl whitespace-pre-wrap z-50 fixed lg:absolute top-[50%] right-[50%] transform translate-x-[50%] translate-y-[-50%] w-[60%] overflow-y-scroll max-h-[100vh] lg:h-[90%] outline-none`}>
+        <div className={`my-bg-teal shadow-2xl whitespace-pre-wrap z-50 fixed lg:absolute top-[50%] right-[50%] transform translate-x-[50%] translate-y-[-50%] w-[60%] overflow-y-scroll max-h-[100vh] lg:h-[90%] outline-none`}>
             <div className="border-none h-[100%] shadow-xl relative flex flex-col w-full pointer-events-auto bg-clip-padding rounded-md outline-none text-current">
-                <div className="sticky top-0 z-10  flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 bg-white rounded-t-md">
+                <div className="sticky top-0 z-10  flex flex-shrink-0 items-center justify-between p-4 text-white bg-black rounded-t-md">
                     <p className='text-xl'>Choose file to upload</p>
                     <div className="flex items-center justify-center">
                         <ai.AiFillCloseCircle size={34} className="text-red-600 cursor-pointer hover:scale-110" onClick={() => {props.status(false)}}/>
@@ -83,7 +83,7 @@ export default function Modal(props)
                 </div>
                 <div className="relative h-[100%] p-4">
                     <div className="">
-                        <label htmlFor='fileupload' className='py-4 border border-slate-200 flex justify-center items-center'><ai.AiFillFileAdd className="text-slate-600" size={80} /></label>
+                        <label htmlFor='fileupload' className='py-4 border border-black flex justify-center items-center'><ai.AiFillFileAdd className="text-slate-600" size={80} /></label>
                         <input id="fileupload" name="fileupload" type='file' onChange={(e) => setFiles(e.target.files)} accept=".csv" className='w-[0%]' multiple/>
                     </div>
                     <div>
