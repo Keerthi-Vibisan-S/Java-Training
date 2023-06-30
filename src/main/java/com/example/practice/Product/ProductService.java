@@ -6,6 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -141,7 +144,7 @@ public class ProductService {
 
     // ----- Handling CSV File code -----
     // Multi-threading @Async
-    @Async // This is to seperate the process from the main thread
+//    @Async // This is to seperate the process from the main thread
     void saveProduct(MultipartFile file) throws Exception {
         long start = System.currentTimeMillis();
          parseCSVFile(file);
@@ -195,7 +198,20 @@ public class ProductService {
         return csv.toString();
     }
 
+// Paging
+Page<Product> fidProductsWithPagination(int offset, int pageSize) throws CustomException {
+        try {
+            Page<Product> products = dao.findAll(PageRequest.of(offset, pageSize).withSort(Sort.by("id")));
+            return products;
 
+        } catch (IllegalArgumentException e) {
+            throw new CustomException("Page index must not be less than zero!", 400);
+        }
+        catch (Exception e) {
+            throw new CustomException(ConstantStrings.SERVER_ERROR, 500);
+        }
+
+}
 
 
 

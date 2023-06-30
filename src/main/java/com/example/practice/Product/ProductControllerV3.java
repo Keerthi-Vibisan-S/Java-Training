@@ -32,6 +32,7 @@ class ProductControllerV3 {
     @ApiResponse(responseCode = "500", description = "Error in server while processing file")
     @PostMapping(value = "")
     ResponseEntity<?> saveData(@RequestParam(value = "files") MultipartFile [] files) {
+//        System.out.println(files.length);
         for(MultipartFile f: files) {
             try {
                 service.saveProduct(f);

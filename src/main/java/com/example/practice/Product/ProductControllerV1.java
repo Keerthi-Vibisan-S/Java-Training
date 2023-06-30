@@ -9,11 +9,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -24,19 +26,19 @@ public class ProductControllerV1 {
     ProductService service;
 
     // ---- GET ----
-    @Operation(summary = "Get all products")
-    @ApiResponse(responseCode = "200", description = "Found all Products",
-            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Product.class))})
-    @GetMapping()
-    ResponseEntity <?> getAll()
-    {
-        try{
-            return ResponseHandler.generateResponse("Products Data", HttpStatus.valueOf(200), service.getAll(), null);
-        }
-        catch (CustomException e) {
-            return ResponseHandler.generateResponse(ConstantStrings.CUSTOM_MESSAGE_DB_ERROR, HttpStatus.valueOf(e.getStatus_code()),"-999", e.getMessage());
-        }
-    }
+//    @Operation(summary = "Get all products")
+//    @ApiResponse(responseCode = "200", description = "Found all Products",
+//            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Product.class))})
+//    @GetMapping()
+//    ResponseEntity <?> getAll()
+//    {
+//        try{
+//            return ResponseHandler.generateResponse("Products Data", HttpStatus.valueOf(200), service.getAll(), null);
+//        }
+//        catch (CustomException e) {
+//            return ResponseHandler.generateResponse(ConstantStrings.CUSTOM_MESSAGE_DB_ERROR, HttpStatus.valueOf(e.getStatus_code()),"-999", e.getMessage());
+//        }
+//    }
 
     // ---- GET BY ID ----
     @Operation(summary = "Get a single products")
@@ -124,4 +126,25 @@ public class ProductControllerV1 {
             return ResponseHandler.generateResponse(ConstantStrings.AN_ERROR_OCCURRED, HttpStatus.valueOf(e.getStatus_code()), null, e.getMessage());
         }
     }
-}
+
+    // Get with Paging
+
+//     ---- GET ----
+    @Operation(summary = "Get all products")
+    @ApiResponse(responseCode = "200", description = "Found all Products",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Product.class))})
+    @GetMapping("")
+    ResponseEntity<?> getByPage(@RequestParam(name="offset") String offset, @RequestParam(name="size", required = false, defaultValue = "20") String pagesize) {
+        System.out.println(offset+" --- "+pagesize);
+        try {
+            Page<Product> products = service.fidProductsWithPagination(Integer.parseInt(offset), Integer.parseInt(pagesize));
+            // System.out.println(products);
+            return ResponseHandler.generateResponse(ConstantStrings.SERVER_SUCCESS, HttpStatus.valueOf(200), new PagingResponse(products.getContent(), products.getNumber(), products.getTotalElements(), products.getTotalPages()), null);
+        } catch (NumberFormatException e) {
+            return ResponseHandler.generateResponse(ConstantStrings.BAD_REQUEST, HttpStatus.BAD_REQUEST,"-999", ConstantStrings.PATH_VARIABLE_ERROR);
+        }
+        catch (CustomException e) {
+            return ResponseHandler.generateResponse(ConstantStrings.AN_ERROR_OCCURRED, HttpStatus.valueOf(e.getStatus_code()),"-999", e.getMessage());
+        }
+    }
+ }
