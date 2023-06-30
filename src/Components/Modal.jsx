@@ -3,6 +3,7 @@ import * as ai from 'react-icons/ai';
 import ErrorToast from './Toast/errorToast';
 import  Axios  from 'axios';
 import { fileUpload } from '../utils/apis';
+import { useNavigate } from 'react-router-dom';
 
 export default function Modal(props) 
 {
@@ -12,6 +13,8 @@ export default function Modal(props)
     const [process, setProcess] = useState(false);
     const [errorMsg, setErrorMsg] = useState("An Error Occurred");
     const [toastStatus, setToastStatus] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Shows error while using map
@@ -44,6 +47,11 @@ export default function Modal(props)
             setErrorMsg("Files Uploaded Successfully");
             setToast(true);
             setFile([]); setFiles([]);
+
+            setTimeout(() => {
+                props.status(false);
+                navigate("/");
+            }, 2000);
         }
 
         else {
@@ -76,7 +84,7 @@ export default function Modal(props)
                 <div className="relative h-[100%] p-4">
                     <div className="">
                         <label htmlFor='fileupload' className='py-4 border border-slate-200 flex justify-center items-center'><ai.AiFillFileAdd className="text-slate-600" size={80} /></label>
-                        <input id="fileupload" name="fileupload" type='file' onChange={(e) => setFiles(e.target.files)} className='w-[0%]' multiple/>
+                        <input id="fileupload" name="fileupload" type='file' onChange={(e) => setFiles(e.target.files)} accept=".csv" className='w-[0%]' multiple/>
                     </div>
                     <div>
                         File Count: {file.length} 
